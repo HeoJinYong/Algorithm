@@ -1566,5 +1566,295 @@ for i in range(10):
 
 
 
-- 섹션8
+- 섹션8 [동적계획법 , 위상정렬]
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/1, 2. 네트워크 선 자르기/in2.txt",'rt')
+n = int(data.read())
+def length(l):
+  if l == 1:
+    return 1
+  elif l == 2:
+    return 2
+  else:
+    return length(l-1)+length(l-2)
+length(n)
+```
+
+```python
+#피보나치수열
+n = 28
+def length(l):
+  if l >= 1:
+    if l == 1 or l == 2:
+      return 1
+    elif l == 0 :
+      return 0
+    else:
+      return length(l-1)+length(l-2)
+length(n)
+
+#가장 빠른 피보나치
+def fibonacci(n):
+  val = [0,1]
+  if n < 2:
+    return val[n]
+  else:
+    for i in range(2,n+1):
+      val.append(val[i-1]+val[i-2])
+    return val[n]
+```
+
+```python
+#계단오르기
+n = 7
+
+def length(l):
+  if l == 1:
+    return 1
+  elif l == 2:
+    return 2
+  else:
+    return length(l-1)+length(l-2)
+
+length(n)
+
+#돌다리 건너기
+n = 7
+
+def length(l):
+  if l == 1:
+    return 1
+  elif l == 2:
+    return 2
+  else:
+    return length(l-1)+length(l-2)
+
+length(n+1) #돌다리는 한개 더 건너야 완전히 건널 수 있다.
+```
+
+```python
+#######################################
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/4. 최대부분증가수열/in2.txt",'rt')
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = list(map(int,f.pop(0).split(" ")))
+x.insert(0,0)
+tem = [0]*(n+1)
+tem[1] = 1
+res = 0
+for i in range(2,n+1):
+  max = 0
+  for j in range(i-1,0,-1):
+    if x[i]>x[j] and tem[j] > max:  #기준을 정하는게 중요
+      max = tem[j]
+  tem[i] = max+1
+  if tem[i] > res:
+    res = tem[i]
+
+print(tem)
+print(res)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/6. 가장 높은 탑 쌓기(LIS 응용)/in2.txt",'rt')
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = []
+for i in range(n):
+  x.append(list(map(int,f[i].split(" "))))             
+x.sort(reverse = True)     ############밑넓이에 대해서 미리 (밑넓이, 벽돌의 높이, 무게)
+# print(x)
+tem = [0] * (n)
+tem[0] = x[0][1] #가장 밑넓이가
+res = []
+for i in range(1,n):
+  max = 0
+  for j in range(i-1,-1,-1):
+    if x[i][2] < x[j][2] and tem[j] > max:
+      max = tem[j]
+  tem[i] = max + x[i][1]
+  res.append(tem[i])
+print(res)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/7, 8. 알리바바와 40인의 도둑/in3.txt",'rt')
+f = data.read().split("\n")
+n = int(f.pop(0))
+k = []
+for i in range(n):
+  k.append(list(map(int,f[i].split(" "))))
+tem = [[0]*n for _ in range(n)]
+tem[0][0] = k[0][0]  #초기값 설정
+for i in range(1,n):   #첫행과 첫열에 대한 정의해주기
+  tem[0][i] = k[0][i] + tem[0][i-1]
+  tem[i][0] = k[i][0] + tem[i-1][0]
+
+dx = [-1,0]
+dy = [0,-1]
+
+for a in range(1,n):
+  for b in range(1,n):
+    max = 9999999999999
+    for c in range(2):
+      xx = a + dx[c]
+      yy = b + dy[c]
+      res = tem[xx][yy] + k[a][b]  #한 칸씩에 대한 가장 작은 값을 대입해준다.
+      if res < max:
+        max = res
+        tem[a][b] = max
+
+print(tem[n-1][n-1])
+```
+
+```python
+###########가방문제 (냅색 - 동적계획법)
+del max #int error - 예약어를 변수로 사용한거에 대한 처리
+def knapSack(W,wt,val,n):
+    K = [[0 for x in range(W+1)] for x in range(n+1)]   #각 칸에 대한 여부 (동적계획법 계산하는거 생각)
+
+    for i in range(n+1):
+        for w in range(W+1):
+            if i == 0 or w == 0:
+                K[i][w] = 0
+            elif wt[i-1] <= w:
+                K[i][w] = max(val[i-1] + K[i-1][w-wt[i-1]], K[i-1][w])
+            else:
+                K[i][w] = K[i-1][w]
+
+    return K[n][W]
+
+val = [60,100,120] #각 물건의 가치
+wt = [10,20,30]    #각 물품의 무게
+W = 50             #가방에 넣을 수 있는 무게
+n = len(val)
+
+print(knapSack(W,wt,val,n))  #220은 50kg을 넣을 수 있는 가방에 220가치가 들어가는 것이 최대임!
+```
+
+```python
+########맞음
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/10. 동전교환/in1.txt",'rt')
+f = data.read().split("\n")
+n = int(f.pop(0))
+coin = list(map(int,f.pop(0).split(" ")))
+k = int(f.pop(0))
+
+def knapSack(W,wt,n):
+  global K
+  K = [[0 for x in range(W+1)] for x in range(n+1)]
+  for i in range(n+1):
+    for w in range(W+1):
+      if i == 0 or w == 0:
+        K[i][w] = 0
+      elif wt[i-1] <= w:
+        K[i][w] = max(1 + K[i-1][w-wt[i-1]], K[i-1][w])
+      else:
+        K[i][w] = K[i-1][w]
+  return K[n][W], K
+
+k = 15
+wt = [1,2,5]
+n = 3
+print(knapSack(k,wt,n)) 
+```
+
+```python
+#핵심
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/11. 최대점수 구하기(냅색알고리즘)/in1.txt",'rt')
+f = data.read().split("\n")
+n, k = map(int,f.pop(0).split(" "))
+problem = []
+for i in range(n):
+  problem += [list(map(int,f[i].split(" ")))]
+score = []
+time = []
+for i in range(n):
+  score.append(problem[i][0])
+  time.append(problem[i][1])
+
+def max_score(k,score,time,n):
+  global tem
+  tem =[[0]*(k+1) for _ in range(n+1)]
+  for i in range(n+1):
+    for j in range(k+1):
+      if i==0 or j ==0 :
+        tem[i][j] = 0
+      elif time[i-1] <= j:
+        tem[i][j] = max(score[i-1]+tem[i-1][j-time[i-1]],tem[i-1][j])
+      else:
+        tem[i][j] = tem[i-1][j]
+  return tem[n][k]
+
+print(tem)
+print(score)
+print(time)
+max_score(k,score,time,n)
+```
+
+```python
+#핵심
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 8/12. 플로이드 워샬 알고리즘/in1.txt",'rt')
+f = data.read().split("\n")
+n, m = map(int,f.pop(0).split(" "))
+print(n,m)
+k = []
+for i in range(m):
+  k += [list(map(int,f[i].split(" ")))]
+
+dis = [[0]*n for _ in range(n)]
+for A in range(n):
+  for B in range(n):
+    if A == B:
+      dis[A][B] = 0
+    else:
+      if dis[A][B] == 0:
+        dis[A][B] = 99999  #갈수없는 것을 표시해주기 위해서 정의해준다.
+
+for i in range(m):
+  dis[k[i][0]-1][k[i][1]-1] = k[i][2] #갈수 있는 것에 대한 가중치
+for a in range(n):
+  for b in range(n):
+    for c in range(n):
+      dis[b][c] = min(dis[b][c],dis[b][a] + dis[a][c]) #중간거치는 것과 비교하여 작은 것을 넣어준다.
+
+for A in range(n):
+  for B in range(n):
+    if dis[A][B] == 99999:       #갈수없는 것을 표시해주기 위해서 정의해준다.
+      dis[A][B] = "M"
+
+print(dis)
+```
+
+```python
+#핵심
+n , m = [6,6]
+k = [[1,4],[5,4],[4,3],[2,5],[2,3],[6,2]]
+graph=[[0]*(n+1) for _ in range(n+1)]
+degree=[0]*(n+1)
+dQ=deque()
+
+for i in range(m):
+    a, b=k[i]
+    graph[a][b]=1  #그래프에 연결되어있는 것에 대한 표시
+    degree[b]+=1   #들어오는 것에 대한 차수
+
+for i in range(1, n+1):
+    if degree[i]==0:  #차수가 0이면 dQ에 넣어주고 일한 것으로 표시
+        dQ.append(i)
+        
+while dQ:
+    x=dQ.popleft() #일한 것을 빼준다.
+    print(x, end=' ') #결과값에 더해준다.
+    for i in range(1, n+1): #모든 정점에 대하여 빼준 x에 대해 연결되어 있는 것 빼준다.
+        if graph[x][i]==1:  #연결되어 있으면 차수 빼준다,
+            degree[i]-=1
+            if degree[i]==0: #그리고는 다시 dQ에 넣어준다.
+                dQ.append(i)
+```
+
+
+
+
 
