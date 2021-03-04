@@ -895,9 +895,676 @@ for a in x:
 
 
 
+- 섹션6 [기초적인 DFS]
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/1. 재귀함수란(이진수출력)/in4.txt","rt")
+n = int(data.read())
+res = []
+def change(n):
+  if n == 1:
+    return res.append(1)
+  res.append(n%2)
+  change(n//2)
+
+change(n)
+res.reverse()
+
+print(res)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/3. 부분집합 구하기/in2.txt","rt")
+n = int(data.read())
+ch = [0] *(n+1)
+
+def DFS(v):
+  if v == n+1:  #깊이가 가장 마지막에 오면 그것에 대한 마무리 지어주기
+    for i in range(1,n+1): #ch안에 사용된 것을 추출하기 위한 for 문
+      if ch[i] == 1:
+        print(i, end="")
+    print()
+  else:                
+    ch[v] = 1
+    DFS(v+1)
+    ch[v] = 0
+    DFS(v+1)
+    
+#v는 사용 -> v+1 사용 .... -> n사용 -> 출력
+#                             n미사용 -> 출력
+#                       n-1 미사용 -> n 사용 -> 출력
+# ..............
+
+DFS(1)
+```
+
+```python
+import sys
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/4. 합이 같은 부분집합/in5.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = list(map(int,f.pop(0).split(" ")))
+y = [0]*n
+
+def DFS(v):
+  if v == n:  
+    res = []
+    for i in range(n):
+      if y[i] == 1:
+        res.append(x[i])
+    if sum(res) == sum(x)/2: #마지막까지 오면 사용한 것에 대한 리스트 = 전체의 절반 비교
+      print("YES")
+      sys.exit()
+  else:
+    y[v] = 1
+    DFS(v+1)
+    y[v] = 0
+    DFS(v+1)
+
+DFS(0)
+print("No")
+
+--------------------------------
+
+##위랑 같은 문제
+
+import sys
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/4. 합이 같은 부분집합/in1.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = list(map(int,f.pop(0).split(" ")))
+total = sum(x)
+
+def DFS(L,sum):
+  if sum > total/2:  #전체의 절반보다 크면 그냥 끝내버리기
+    return     
+  if L == n:  #마지막 까지 왔을 때 값에 비교
+    if sum == (total-sum):
+      print("Yes")
+      sys.exit()
+  else:
+    DFS(L+1,sum+x[L]) #사용하고 다음꺼 비교 -> 결국 다음꺼도 사용하고 안하고
+    DFS(L+1,sum)   #사용안하고 다음꺼 비교 -> 결국 다음꺼도 사용하고 안하고
+DFS(0,0)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/5. 바둑이 승차/in5.txt","rt")
+f = data.read().split("\n")
+n, m = map(int,f.pop(0).split(" "))
+x = list(map(int,f))
+tem = 0
+
+def DFS(L,sum):
+  global tem
+  if sum > n:
+    return
+  if L == m:
+    if tem < sum <= n: #사용 된거의 합이 가방의 무게보다는 작거나 같고 tem보다는 큰!
+      tem = sum
+  else:
+    DFS(L+1,sum+x[L])
+    DFS(L+1,sum)
+DFS(0,0)
+print(tem)
+```
+
+```python
+#############################################
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/7. 동전교환/in5.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = list(map(int,f.pop(0).split(" ")))
+print(x)
+print(n)
+x.reverse() # 일부러 큰 것부터 비교해주기 위해서 (빠른 처리)
+m = int(f.pop(0))
+print(m)
+res = 99999  #가장 최소의 갯수를 구하기 위한 기준
+
+def DFS(L,sum):
+  global res
+  if L >= res:  #최소 갯수 보다 크면 중단
+    return
+  if sum > m:   #기준에 되는 값보다 크면 중단
+    return
+  if sum == m:  #기준에 맞는 값이면 그것에 사용된 갯수를 비교하여 재설정
+    if L < res:
+      res = L
+  else:
+    for i in range(n): #일단 제일 큰 값부터 비교해주는 것이기 때문에
+      DFS(L+1,sum+x[i]) #비교금액에 넘어가는 경우에는 재귀함수 기준 넘어감
+      
+DFS(0,0)
+print(res)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/8. 순열 구하기/in1.txt","rt")
+n, m = map(int,data.read().split(" "))
+x = [i for i in range(1,n+1)]
+cnt = 0
+y = [0]*m #m개에 대한 리스트 넣어주기
+ch = [0]*(n+1)
+cnt = 0
+def DFS(v):
+  global cnt
+  if v == m:
+    for i in range(m):
+      print(y[i], end = " ")
+    cnt += 1
+    print()
+  else:
+    for i in range(1,n+1):
+      if ch[i] == 0: #기준이 되었던 값이 사용되지 않았으면              
+        ch[i] = 1  #그것을 사용한다고 표시하고                          1. ch[1] = 1  4. ch[2] = 1    8. ch[3] = 1            13.ch[2] = 1 ...->
+        y[v] = i  #그것을 결과 리스트에 넣어주고                        2. y[0] = 1   5. y[1] = 2     9. y[1] = 3
+        DFS(v+1) #그다음 것을 비교한다.                                 3. DFS(1)     6. DFS(2) 종료  10. DFS(2) 종료
+        ch[i] = 0 #그리고는 사용하지 않았다고 표기                                    7. ch[2] = 0    11. ch[3] = 0
+DFS(0)                                                                  12. ch[1] = 0
+print(cnt)
+```
+
+```python
+###############################################################3
+import sys
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/9. 수열 추측하기/in3.txt","rt")
+n, m = map(int,data.read().split(" "))
+x = [i for i in range(1,n+1)]
+cnt = 0
+y = [0]*(n+1)
+ch = [0]*(n)
+a = [1] * (n)
+for i in range(1,n):               #각 위치별로 사용되는 횟수 정해주기
+  a[i]= int(a[i-1]*((n-i)/i))
+
+def DFS(L,sum):
+  if sum == m and L == n:
+    for i in range(n):
+      print(ch[i], end=' ')
+    sys.exit()
+  else:
+    for i in range(1,n+1):
+      if y[i] == 0:
+        y[i] = 1
+        ch[L] = i
+        DFS(L+1,sum+(ch[L]*a[L])) #각 순서별로 위에서 정해준 a리스트에서의 만큼 사용
+        y[i] = 0
+        
+DFS(0,0)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/10. 조합 구하기/in1.txt","rt")
+n, m = map(int,data.read().split(" "))
+n=4
+m=2
+x = [i for i in range(1,n+1)]
+cnt = 0
+res = [0]*(n)
+def DFS(v,s):
+  global cnt
+  if v == m:
+    for i in range(m):
+      print(res[i], end=" ")
+    cnt +=1
+    print()
+  else:
+    for i in range(s,n+1):  #                                
+      res[v] = i           # 1. res[0] = 1   3.res[1] = 2    5.res[1] = 3
+      DFS(v+1,i+1)         # 2. DFS(1,2)     4.DFS(2,3)종료  6.DFS(2,3)종료
+                           # 7. res[0] = 2  ...>
+DFS(0,1)
+print(cnt)
 
 
-- 섹션6
-- 섹션7
+-------------------------------
+
+#위에 문제 조합으로 풀기
+from itertools import combinations
+
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/10. 조합 구하기/in1.txt","rt")
+n, m = map(int,data.read().split(" "))
+
+x = [i for i in range(1,n+1)]
+k = list(combinations(x,m))
+
+for i in range(len(k)):
+  print(k[i])
+print(len(k))
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/11. 수들의 조합/in1.txt","rt")
+f = data.read().split("\n")
+n, m = map(int,f.pop(0).split(" "))
+x = list(map(int,f.pop(0).split(" ")))
+k = int(f.pop(0))
+cnt = 0
+def DFS(L,s,sum):
+  global cnt
+  if L==m:   #마지막 까지 왔을 때 그것의 합이 6의 배수인지 확인하고 갯수 추가
+    if sum%k == 0:
+      cnt+=1
+  else:
+    for i in range(s,n):   #레벨 높이기 , 사용된 것에 대한 기준으로 s, 합구하기
+      DFS(L+1,i+1,sum+x[i])  
+
+DFS(0,0,0)
+print(cnt)
+```
+
+```python
+#################################################################
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 6/15. 경로탐색/in1.txt","rt")
+f = data.read().split("\n")
+n, m = map(int,f.pop(0).split(" "))
+
+cnt = 0
+ch = [0]*(n+1)
+tem = [[0]*(n+1) for _ in range(n+1)]
+
+ch[1] = 1
+for i in range(m):
+  a, b=map(int, f.pop(0).split(" "))
+  tem[a][b]=1
+
+path = []
+path.append(1)                                         #ch[1] = 1 , append(1)  1을 사용한 것으로 지정해준다.
+
+def DFS(v):
+  global cnt, path
+  if v==n:
+    cnt+=1
+    print(1)
+    # for x in path:
+      # print(x, end=' ')
+    # print()
+  else:
+    for i in range(1, n+1):
+      if tem[v][i]==1 and ch[i]==0:                      #1.tem[1][1] == 1 & ch[1]==0 옳지 않다 -> tem[1][2] == 1 & ch[2] == 0?   5.tem[2][3] & ch[3] == 0
+        ch[i]=1                                          #2. ch[2] = 1                                                            6.ch[3] = 1
+        path.append(i)                                   #3. path.append(2)                                                       7. append(3)
+        print(i,ch,path)                         
+        DFS(i)                                           #4. DFS(2)                                                               8. DFS(3)
+        path.pop()
+        ch[i]=0
+
+print(tem)
+DFS(1)
+# print(cnt)
+```
+
+
+
+- 섹션7 [DFS , BFS]
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/1. 최대점수 구하기/in2.txt","rt")
+f = data.read().split("\n")
+n,m = map(int,f.pop(0).split(" "))
+pv = []
+pt = []
+for i in range(n):
+  a, b=map(int,f[i].split(" "))
+  pv.append(a)
+  pt.append(b)
+
+res = -99999999999
+def DFS(L,sum,time):
+  global res
+  if time > m: #시간이 기준보다 크면 리텅
+    return
+  if L == n : #최대 깊이 까지 왔을 때 합을 비교
+    if sum > res:
+      res = sum
+  else:
+    DFS(L+1,sum+pv[L],time+pt[L])  #사용하기 때문에 시간하고 점수를 더해줌
+    DFS(L+1,sum,time)             #사용하지 않기 때문에 시간하고 점수를 더해주지 않음
+DFS(0,0,0)
+print(res)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/2. 휴가/in3.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+pv =[]
+pt =[]
+for i in range(n):
+  a, b=map(int,f[i].split(" "))
+  pv.append(a)
+  pt.append(b)
+
+res = -99999999999
+def DFS(L,sum):
+  global res
+  if L > n:
+    return
+  if L == n :
+    if sum > res:
+      res = sum
+  else:
+    DFS(L+pv[L],sum+pt[L]) #사용하게 되면 일자를 그만큼 뒤로 미뤄줘야하고 합계는 더해준다.
+    DFS(L+1,sum)           #사용하지 않으면 일자는 하루만 미루고 합계는 더해주지 않는다.
+
+DFS(0,0)
+print(res)
+```
+
+```python
+#######################################
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/3. 양팔저울/in4.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = list(map(int,f.pop(0).split(" ")))
+s = sum(x)
+res = set()
+def DFS(L,sum):
+  global res
+  if L == n:
+    if 0<sum<=s:  #0~전체합 사이에 존재하면 집합에 넣어준다. 나중에 비교하기 위해서
+      res.add(sum)
+  else:
+    DFS(L+1,sum+x[L]) #무게의 기준을 더해주냐
+    DFS(L+1,sum-x[L]) #무게의 기준을 빼주냐
+    DFS(L+1,sum)      #아예 사용하지 않느냐
+DFS(0,0)
+print(s-len(res))
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/4. 동전바꿔주기/in2.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+m = int(f.pop(0))
+pv = []
+pt = []
+for i in range(m):
+  a, b=map(int,f[i].split(" "))
+  pv.append(a)
+  pt.append(b)
+cnt = 0
+
+print(pv,pt)
+
+def DFS(L,sum):
+  global cnt
+  if sum > n:
+    return
+  if L == m:
+    if sum == n:
+      cnt+=1
+  else:
+    for i in range(pt[L]+1): #동전의 갯수에 대한 기준    
+      DFS(L+1,sum+(pv[L]*i)) #그 금액 만큼 더해주는 것   1.DFS(1,pv[0]*(0~pt[0]))
+
+DFS(0,0)
+print(cnt)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/5. 동전분배하기/in1.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = list(map(int,f))
+money = [0]*3
+res = 99999999999
+
+def DFS(L):
+  global res, tem
+  if L == n:
+    k = max(money) - min(money)
+    if k < res:                         #k가 가장 작은 값이 되면 그것을 res에 대입
+      tem = set()
+      for i in money:                  #모든 사람의 값이 달라야하기 때문에 집합으로 갯수 비교
+        tem.add(i)
+      if len(tem) == 3:
+        res = k
+        print(tem)
+  else:
+    for i in range(3):
+      money[i] += x[L]                     #1.money[0] += x[0]        3.money[0] += x[1]
+      DFS(L+1)                             #2. DFS(1)
+      money[i] -= x[L]
+
+DFS(0)
+print(res)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/7. 송아지 찾기/in4.txt","rt")
+n,m = map(int,data.read().split(" "))
+res = 9999999999
+cnt = 0
+
+print(n,m)
+
+if m > n:
+  while m-n >= 5:
+    cnt+=1
+    n += 5
+if m-n == 4:
+  n=m
+  cnt = cnt + 2
+else:
+  cnt = cnt + abs(m-n)
+
+print(cnt)
+```
+
+```python
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/8. 사과나무/in3.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+x = []
+for i in range(n):
+  x.append(list(map(int,f[i].split(" "))))
+
+res = []
+y = [0]*n
+y[0] = n//2
+y[-1] = n//2
+for i in range(1,n//2):  #각 행마다 빼줘야하는 갯수 정리
+  y[i] = y[i-1] - 1
+  y[-i-1] = y[-i] - 1
+
+for i in range(n):
+  a = x[i]
+  for j in range(y[i]):
+    a.pop(0)
+    a.pop(-1)
+  res += a
+
+print(sum(res))
+```
+
+```python
+from collections import deque as dq
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/9. 미로의 최단거리 통로/in2.txt","rt")
+f = data.read().split("\n")
+board = []
+for i in range(7):
+  board.append(list(map(int,f[i].split(" "))))
+board[0][0] = 1   #출발점에 대한 정의
+dis = [[0] * 7 for i in range(7)]
+dx = [1,-1,0,0]   
+dy = [0,0,1,-1]
+q = dq() #가장 최근에 대한 좌표 입력해주기 위해서
+q.append((0,0))
+
+while q:
+  tem = q.popleft()
+  for i in range(4): # x+1, x-1, y+1, y-1
+    x = tem[0] + dx[i]  #tem[0] = x , tem[1] = y
+    y = tem[1] + dy[i]
+    if 0<=x<=6 and 0<=y<=6 and board[x][y]==0:
+      board[x][y]=1
+      dis[x][y]=dis[tem[0]][tem[1]]+1
+      q.append((x, y))
+if dis[6][6] == 0:
+  print(-1)
+else:
+  print(dis[6][6])
+```
+
+```python
+from collections import deque as dq
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/10. 미로탐색/in2.txt","rt")
+f = data.read().split("\n")
+board = []
+for i in range(7):
+  board.append(list(map(int,f[i].split(" "))))
+board[0][0]=1
+dx = [1,-1,0,0]
+dy = [0,0,1,-1]
+cnt = 0
+
+def DFS(x,y):
+  global cnt
+  if x == 6 and y == 6:
+    cnt +=1
+  else:
+    for i in range(4):
+      xx = x + dx[i]
+      yy = y + dy[i]
+      if 0 <=xx<=6 and 0 <=yy<=6 and board[xx][yy]==0:
+        board[xx][yy] = 1
+        DFS(xx,yy)
+        board[xx][yy] = 0
+
+DFS(0,0)
+print(cnt)
+```
+
+```python
+from collections import deque as dq
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/11. 등산경로/in5.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+board = []
+for i in range(n):
+  board.append(list(map(int,f[i].split(" "))))
+dx = [1,-1,0,0]
+dy = [0,0,1,-1]
+cnt = 0
+def DFS(x,y):
+  global cnt
+  if x > n or y > n:
+    return
+  if x == n-1 and y == n-1:
+    cnt +=1
+  else:
+    for i in range(4):
+      xx = x + dx[i]
+      yy = y + dy[i]
+      if 0 <=xx<=n-1 and 0 <=yy<=n-1 and board[x][y] < board[xx][yy]:
+        DFS(xx,yy)
+
+DFS(0,0)
+print(cnt)
+```
+
+```python
+from collections import deque as dq
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/12. 단지번호붙이기/in3.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+board = []
+for i in range(n):
+  board.append(list(map(int,f[i])))
+
+print(board)
+
+dx = [1,-1,0,0]
+dy = [0,0,1,-1]
+
+def DFS(x,y):
+  global cnt
+  cnt+=1
+  board[x][y]=0
+  for i in range(4):
+    xx=x+dx[i]
+    yy=y+dy[i]
+    if 0<=xx<n and 0<=yy<n and board[xx][yy]==1:
+      DFS(xx, yy)
+
+res = []
+for a in range(n):
+  for b in range(n):
+    if board[a][b] == 1:
+      cnt = 0
+      DFS(a,b)
+      res.append(cnt)
+      
+res.sort()
+print(len(res))
+print(res)
+```
+
+```python
+from collections import deque as dq
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/13. 섬나라 아일랜드/in3.txt","rt")
+f = data.read().split("\n")
+n = int(f.pop(0))
+board = []
+for i in range(n):
+  board.append(list(map(int,f[i].split(" "))))
+
+dx = [1,-1,0,0,1,1,-1,-1] #대각선까지 포함해줘야하기 때문에
+dy = [0,0,1,-1,1,-1,1,-1]
+
+def DFS(x,y):
+  global cnt
+  cnt+=1
+  board[x][y]=0
+  for i in range(8):
+    xx=x+dx[i]
+    yy=y+dy[i]
+    if 0<=xx<n and 0<=yy<n and board[xx][yy]==1:
+      DFS(xx, yy)
+
+res = []
+for a in range(n):
+  for b in range(n):
+    if board[a][b] == 1:
+      cnt = 0
+      DFS(a,b)
+      res.append(cnt)
+      
+res.sort()
+print(len(res))
+```
+
+```python
+from collections import deque
+data = open("/content/gdrive/My Drive/알고리즘스터디/파이썬알고리즘_문제풀이/섹션 7/16. 사다리타기/in2.txt","rt")
+f = data.read().split("\n")
+board = []
+for i in range(10):
+  board.append(list(map(int,f[i].split(" "))))
+dis = [[0]*10 for i in range(10)]
+
+print(dis)
+
+def DFS(x,y):
+  dis[x][y] = 1  #경로해줘야한다. 했던 곳을 또 반복해서 갈 수 도 있기 때문에.
+  if x == 0:
+    print(y)
+  else:
+    if y-1>=0 and board[x][y-1]==1 and dis[x][y-1]==0:  #왼쪽으로 이동
+      DFS(x, y-1)
+    elif y+1<10 and board[x][y+1]==1 and dis[x][y+1]==0: #오른쪽으로 이동
+      DFS(x, y+1)
+    else:
+      DFS(x-1, y)                                       #그냥 위로 이동
+
+for i in range(10):
+  if board[9][i] == 2:
+    DFS(9,i)
+```
+
+
+
 - 섹션8
 
